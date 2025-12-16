@@ -1,0 +1,192 @@
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bảng Xếp Hạng</title>
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;900&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Montserrat', sans-serif;
+    background: transparent;
+}
+
+/* ===== CONTAINER GỌN CHO EMBED ===== */
+.container {
+    width: 100%;
+    max-width: 360px;
+    margin: 0 auto;
+    background: #fff;
+    border-radius: 14px;
+    overflow: hidden;
+}
+
+/* ===== ROW ===== */
+.player-row {
+    display: grid;
+    grid-template-columns: 34px 36px 1fr 58px;
+    align-items: center;
+    padding: 10px 12px;
+    border-bottom: 1.5px solid #0c409f;
+}
+
+
+
+/* ===== TREND ===== */
+.trend {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1px;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.trend-up {
+    color: #00b050;
+}
+
+.trend-down {
+    color: #ff0000;
+}
+
+.trend-same {
+    color: #999;
+}
+
+.trend small {
+    font-size: 10px;
+    font-weight: 600;
+}
+
+/* ===== RANK ===== */
+.rank-number {
+    text-align: center;
+    font-size: 16px;
+    font-weight: 900;
+    color: #0c409f;
+}
+
+.player-row.top-rank .rank-number {
+    color: #ff9800;
+}
+
+/* ===== NAME ===== */
+.player-name {
+    font-size: 13px;
+    font-weight: 700;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    padding: 0 6px;
+}
+
+/* ===== SCORE ===== */
+.player-score {
+    text-align: right;
+    font-size: 15px;
+    font-weight: 900;
+}
+
+.player-score span {
+    font-size: 10px;
+    font-weight: 500;
+    color: #666;
+}
+
+/* ===== STATE ===== */
+.loading,
+.error {
+    text-align: center;
+    padding: 28px 16px;
+    font-size: 13px;
+    color: #666;
+}
+
+.error {
+    color: #ff0000;
+}
+</style>
+
+<div class="container">
+    <div id="leaderboard">
+        <div class="loading">Đang tải dữ liệu...</div>
+    </div>
+</div>
+
+<script>
+const API_URL = 'https://script.google.com/macros/s/AKfycbz1aX1mwO3d76cXKW6eZxbT8_3L2eu7YzanH6WYxvbzxyL44tFuOYkf_30Gr3zXh6Zm/exec';
+
+/* ===== TREND LOGIC ===== */
+function renderTrend(diffRank) {
+    if (diffRank === '-' || diffRank === null || diffRank === undefined) {
+        return '<div class="trend trend-same">━</div>';
+    }
+
+    const n = Number(diffRank);
+
+    if (n > 0) {
+        return `<div class="trend trend-up">▲<small>+${n}</small></div>`;
+    }
+
+    if (n < 0) {
+        return `<div class="trend trend-down">▼<small>${n}</small></div>`;
+    }
+
+    return '<div class="trend trend-same">━</div>';
+}
+
+/* ===== LOAD DATA ===== */
+async function loadData() {
+    const leaderboard = document.getElementById('leaderboard');
+
+    try {
+        const res = await fetch(API_URL + '?t=' + Date.now());
+        if (!res.ok) throw new Error(res.status);
+
+        const data = await res.json();
+
+        if (!data || data.length === 0) {
+            leaderboard.innerHTML = '<div class="error">Không có dữ liệu</div>';
+            return;
+        }
+
+        leaderboard.innerHTML = '';
+
+        data.forEach(item => {
+            const row = document.createElement('div');
+            row.className = 'player-row';
+
+            const rank = item.rank || 0;
+            const name = item.name || 'Unknown';
+            const score = item.total || 0;
+            const diffRank = item.diff_rank;
+
+            if (rank <= 3) {
+                row.classList.add('top-rank');
+            }
+
+            row.innerHTML = `
+                ${renderTrend(diffRank)}
+                <div class="rank-number">${rank}</div>
+                <div class="player-name">${name}</div>
+                <div class="player-score">${score}<span> TẤT</span></div>
+            `;
+
+            leaderboard.appendChild(row);
+        });
+
+    } catch (err) {
+        leaderboard.innerHTML = '<div class="error">Lỗi tải dữ liệu</div>';
+        console.error(err);
+    }
+}
+
+loadData();
+setInterval(loadData, 30000);
+</script>
