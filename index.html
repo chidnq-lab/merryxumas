@@ -15,32 +15,47 @@ body {
     font-family: 'Montserrat', sans-serif;
     background: transparent;
 }
-    .page {
-  background-image: url('https://github.com/chidnq-lab/merryxumas/blob/main/images/final.png');
-  background-size: cover;
-  background-position: center top;
-  background-repeat: no-repeat;
-}
 
 /* ===== CONTAINER GỌN CHO EMBED ===== */
 .container {
     width: 100%;
     max-width: 360px;
     margin: 0 auto;
-    background: #fff;
-    border-radius: 14px;
-    overflow: hidden;
+    background-image: url('https://uploads.onecompiler.io/447q9kxtv/447q8t9qe/final.png');
+    background-size: 100% auto;
+    background-repeat: no-repeat;
+    background-position: top center;
+    padding-top: 380px; /* 👈 đẩy leaderboard xuống dưới ảnh */
+    background-color: #fff;
+}
+
+.leaderboard-title {
+    text-align: center;
+    font-size: 18px;
+    font-weight: 900;
+    color: #0b409f;
+    letter-spacing: 0.5px;
+    margin-top: -50px;   /* 👈 đẩy chữ lên trên */
+    margin-bottom: 15px;
+    position: relative;
+
 }
 
 /* ===== ROW ===== */
 .player-row {
     display: grid;
+    max-width: 320px;      /* 👈 bảng gọn hơn ảnh */
+    margin: 0 auto;
+    padding: 0 4px 8px;
+    height: 30px;              /* 👈 quan trọng */
+    display: grid;
     grid-template-columns: 34px 36px 1fr 58px;
     align-items: center;
-    padding: 10px 12px;
+    padding: 0 8px;            /* 👈 bỏ padding top/bottom */
     border-bottom: 1.5px solid #0c409f;
-}
 
+
+}
 
 
 /* ===== TREND ===== */
@@ -51,6 +66,9 @@ body {
     gap: 1px;
     font-size: 13px;
     font-weight: 700;
+    line-height: 1;          /* 👈 quan trọng */
+    display: flex;
+
 }
 
 .trend-up {
@@ -73,8 +91,8 @@ body {
 /* ===== RANK ===== */
 .rank-number {
     text-align: center;
-    font-size: 16px;
-    font-weight: 900;
+    font-size: 15px;
+    font-weight: 700;
     color: #0c409f;
 }
 
@@ -84,8 +102,8 @@ body {
 
 /* ===== NAME ===== */
 .player-name {
-    font-size: 13px;
-    font-weight: 700;
+    font-size: 10px;
+    /*font-weight:600;*/
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -96,7 +114,9 @@ body {
 .player-score {
     text-align: right;
     font-size: 15px;
-    font-weight: 900;
+    font-weight: 700;
+    justify-content: flex-end;
+    gap: 2px;
 }
 
 .player-score span {
@@ -120,6 +140,8 @@ body {
 </style>
 
 <div class="container">
+    <div class="leaderboard-title">BẢNG XẾP HẠNG</div>
+
     <div id="leaderboard">
         <div class="loading">Đang tải dữ liệu...</div>
     </div>
