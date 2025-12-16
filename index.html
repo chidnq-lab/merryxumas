@@ -14,54 +14,58 @@
             box-sizing: border-box;
         }
 
+        html, body {
+            width: 100%;
+        }
+
         body {
             font-family: 'Montserrat', sans-serif;
-            background: transparent;
+            background: #fff;
+            overflow-y: auto;
         }
 
-        /* ===== WRAPPER ===== */
+        /* ===== CONTAINER ===== */
         .container {
             width: 100%;
-            max-width: 360px;
-            margin: 0 auto;
-            background-color: #fff;
+            max-width: 100%;
+            margin: 0;
         }
 
-        /* ===== HEADER IMAGE ===== */
+        /* ===== HEADER ===== */
         .header {
-            height: 380px;
+            width: 100%;
+            aspect-ratio: 3 / 3;
             background-image: url('./images/final.png');
             background-size: cover;
             background-position: top center;
             position: relative;
-            border-radius: 50px;
         }
 
         .leaderboard-title {
             position: absolute;
-            bottom: 12px;
+            bottom: 10px;          /* 👈 KÉO LÊN */
             left: 50%;
             transform: translateX(-50%);
-            font-size: 16px;
+            font-size: 19px;
             font-weight: 900;
             color: #0b409f;
             letter-spacing: 0.5px;
-            text-align: center;
         }
+
 
         /* ===== CONTENT ===== */
         .content {
             padding: 6px 0 10px;
         }
 
-        /* ===== ROW ===== */
+        /* ===== ROW (KHÓA CỘT – KHÔNG LỆCH) ===== */
         .player-row {
             display: grid;
-            grid-template-columns: 34px 36px 1fr 58px;
+            grid-template-columns: 36px 42px 1fr 64px;
             align-items: center;
-            max-width: 320px;
+            width: calc(100% - 24px);
             margin: 0 auto;
-            height: 34px;
+            height: 36px;
             padding: 0 6px;
             border-bottom: 1.5px solid #0c409f;
         }
@@ -91,11 +95,32 @@
             text-align: center;
             font-size: 15px;
             font-weight: 700;
-            color: #0c409f;
         }
 
+        .top-rank {
+            background: rgba(255, 152, 0, 0.06);
+        }
+        
         .top-rank .rank-number {
             color: #ff9800;
+            font-weight: 800;
+            font-size: 15px;
+        }
+        
+        .top-rank .player-name {
+            font-weight: 700;
+            color: #0b409f;
+            font-size: 15px;
+        }
+        
+        .top-rank .player-score {
+            font-weight: 800;
+            color: #0b409f;
+        }
+        
+        .top-rank .player-score span {
+            color: #0b409f;
+
         }
 
         /* ===== NAME ===== */
@@ -112,6 +137,7 @@
             text-align: right;
             font-size: 15px;
             font-weight: 700;
+
         }
 
         .player-score span {
