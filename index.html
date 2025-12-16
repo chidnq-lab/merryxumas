@@ -1,220 +1,213 @@
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Bảng Xếp Hạng</title>
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bảng Xếp Hạng</title>
 
-<style>
-@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;900&display=swap');
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;900&display=swap');
 
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-
-body {
-    font-family: 'Montserrat', sans-serif;
-    background: transparent;
-}
-
-/* ===== CONTAINER GỌN CHO EMBED ===== */
-.container {
-    width: 100%;
-    max-width: 360px;
-    margin: 0 auto;
-    background-image: url('./images/final.png');
-    background-size: 100% auto;
-    background-repeat: no-repeat;
-    background-position: top center;
-    padding-top: 380px; /* 👈 đẩy leaderboard xuống dưới ảnh */
-    background-color: #fff;
-}
-
-.leaderboard-title {
-    text-align: center;
-    font-size: 18px;
-    font-weight: 900;
-    color: #0b409f;
-    letter-spacing: 0.5px;
-    margin-top: -50px;   /* 👈 đẩy chữ lên trên */
-    margin-bottom: 15px;
-    position: relative;
-
-}
-
-/* ===== ROW ===== */
-.player-row {
-    display: grid;
-    max-width: 320px;      /* 👈 bảng gọn hơn ảnh */
-    margin: 0 auto;
-    padding: 0 4px 8px;
-    height: 30px;              /* 👈 quan trọng */
-    display: grid;
-    grid-template-columns: 34px 36px 1fr 58px;
-    align-items: center;
-    padding: 0 8px;            /* 👈 bỏ padding top/bottom */
-    border-bottom: 1.5px solid #0c409f;
-
-
-}
-
-
-/* ===== TREND ===== */
-.trend {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 1px;
-    font-size: 13px;
-    font-weight: 700;
-    line-height: 1;          /* 👈 quan trọng */
-    display: flex;
-
-}
-
-.trend-up {
-    color: #00b050;
-}
-
-.trend-down {
-    color: #ff0000;
-}
-
-.trend-same {
-    color: #999;
-}
-
-.trend small {
-    font-size: 10px;
-    font-weight: 600;
-}
-
-/* ===== RANK ===== */
-.rank-number {
-    text-align: center;
-    font-size: 15px;
-    font-weight: 700;
-    color: #0c409f;
-}
-
-.player-row.top-rank .rank-number {
-    color: #ff9800;
-}
-
-/* ===== NAME ===== */
-.player-name {
-    font-size: 10px;
-    /*font-weight:600;*/
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    padding: 0 6px;
-}
-
-/* ===== SCORE ===== */
-.player-score {
-    text-align: right;
-    font-size: 15px;
-    font-weight: 700;
-    justify-content: flex-end;
-    gap: 2px;
-}
-
-.player-score span {
-    font-size: 10px;
-    font-weight: 500;
-    color: #666;
-}
-
-/* ===== STATE ===== */
-.loading,
-.error {
-    text-align: center;
-    padding: 28px 16px;
-    font-size: 13px;
-    color: #666;
-}
-
-.error {
-    color: #ff0000;
-}
-</style>
-
-<div class="container">
-    <div class="leaderboard-title">BẢNG XẾP HẠNG</div>
-
-    <div id="leaderboard">
-        <div class="loading">Đang tải dữ liệu...</div>
-    </div>
-</div>
-
-<script>
-const API_URL = 'https://script.google.com/macros/s/AKfycbz1aX1mwO3d76cXKW6eZxbT8_3L2eu7YzanH6WYxvbzxyL44tFuOYkf_30Gr3zXh6Zm/exec';
-
-/* ===== TREND LOGIC ===== */
-function renderTrend(diffRank) {
-    if (diffRank === '-' || diffRank === null || diffRank === undefined) {
-        return '<div class="trend trend-same">━</div>';
-    }
-
-    const n = Number(diffRank);
-
-    if (n > 0) {
-        return `<div class="trend trend-up">▲<small>+${n}</small></div>`;
-    }
-
-    if (n < 0) {
-        return `<div class="trend trend-down">▼<small>${n}</small></div>`;
-    }
-
-    return '<div class="trend trend-same">━</div>';
-}
-
-/* ===== LOAD DATA ===== */
-async function loadData() {
-    const leaderboard = document.getElementById('leaderboard');
-
-    try {
-        const res = await fetch(API_URL + '?t=' + Date.now());
-        if (!res.ok) throw new Error(res.status);
-
-        const data = await res.json();
-
-        if (!data || data.length === 0) {
-            leaderboard.innerHTML = '<div class="error">Không có dữ liệu</div>';
-            return;
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
 
-        leaderboard.innerHTML = '';
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background: transparent;
+        }
 
-        data.forEach(item => {
-            const row = document.createElement('div');
-            row.className = 'player-row';
+        /* ===== WRAPPER ===== */
+        .container {
+            width: 100%;
+            max-width: 360px;
+            margin: 0 auto;
+            background-color: #fff;
+        }
 
-            const rank = item.rank || 0;
-            const name = item.name || 'Unknown';
-            const score = item.total || 0;
-            const diffRank = item.diff_rank;
+        /* ===== HEADER IMAGE ===== */
+        .header {
+            height: 380px;
+            background-image: url('./images/final.png');
+            background-size: cover;
+            background-position: top center;
+            position: relative;
+        }
 
-            if (rank <= 3) {
-                row.classList.add('top-rank');
+        .leaderboard-title {
+            position: absolute;
+            bottom: 12px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 16px;
+            font-weight: 900;
+            color: #0b409f;
+            letter-spacing: 0.5px;
+            text-align: center;
+        }
+
+        /* ===== CONTENT ===== */
+        .content {
+            padding: 6px 0 10px;
+        }
+
+        /* ===== ROW ===== */
+        .player-row {
+            display: grid;
+            grid-template-columns: 34px 36px 1fr 58px;
+            align-items: center;
+            max-width: 320px;
+            margin: 0 auto;
+            height: 34px;
+            padding: 0 6px;
+            border-bottom: 1.5px solid #0c409f;
+        }
+
+        /* ===== TREND ===== */
+        .trend {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+            font-weight: 700;
+            line-height: 1;
+            gap: 1px;
+        }
+
+        .trend-up { color: #00b050; }
+        .trend-down { color: #ff0000; }
+        .trend-same { color: #999; }
+
+        .trend small {
+            font-size: 10px;
+            font-weight: 600;
+        }
+
+        /* ===== RANK ===== */
+        .rank-number {
+            text-align: center;
+            font-size: 15px;
+            font-weight: 700;
+            color: #0c409f;
+        }
+
+        .top-rank .rank-number {
+            color: #ff9800;
+        }
+
+        /* ===== NAME ===== */
+        .player-name {
+            font-size: 10px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            padding: 0 6px;
+        }
+
+        /* ===== SCORE ===== */
+        .player-score {
+            text-align: right;
+            font-size: 15px;
+            font-weight: 700;
+        }
+
+        .player-score span {
+            font-size: 10px;
+            font-weight: 500;
+            color: #666;
+        }
+
+        /* ===== STATE ===== */
+        .loading,
+        .error {
+            text-align: center;
+            padding: 24px 16px;
+            font-size: 13px;
+            color: #666;
+        }
+
+        .error {
+            color: #ff0000;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="leaderboard-title">BẢNG XẾP HẠNG</div>
+        </div>
+
+        <div class="content" id="leaderboard">
+            <div class="loading">Đang tải dữ liệu...</div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'https://script.google.com/macros/s/AKfycbz1aX1mwO3d76cXKW6eZxbT8_3L2eu7YzanH6WYxvbzxyL44tFuOYkf_30Gr3zXh6Zm/exec';
+
+        function renderTrend(diffRank) {
+            if (diffRank === '-' || diffRank === null || diffRank === undefined) {
+                return '<div class="trend trend-same">━</div>';
             }
 
-            row.innerHTML = `
-                ${renderTrend(diffRank)}
-                <div class="rank-number">${rank}</div>
-                <div class="player-name">${name}</div>
-                <div class="player-score">${score}<span> TẤT</span></div>
-            `;
+            const n = Number(diffRank);
 
-            leaderboard.appendChild(row);
-        });
+            if (n > 0) {
+                return `<div class="trend trend-up">▲<small>+${n}</small></div>`;
+            }
 
-    } catch (err) {
-        leaderboard.innerHTML = '<div class="error">Lỗi tải dữ liệu</div>';
-        console.error(err);
-    }
-}
+            if (n < 0) {
+                return `<div class="trend trend-down">▼<small>${n}</small></div>`;
+            }
 
-loadData();
-setInterval(loadData, 30000);
-</script>
+            return '<div class="trend trend-same">━</div>';
+        }
+
+        async function loadData() {
+            const leaderboard = document.getElementById('leaderboard');
+
+            try {
+                const res = await fetch(API_URL + '?t=' + Date.now());
+                if (!res.ok) throw new Error(res.status);
+
+                const data = await res.json();
+
+                if (!data || data.length === 0) {
+                    leaderboard.innerHTML = '<div class="error">Không có dữ liệu</div>';
+                    return;
+                }
+
+                leaderboard.innerHTML = '';
+
+                data.forEach(item => {
+                    const row = document.createElement('div');
+                    row.className = 'player-row';
+
+                    if (item.rank <= 3) {
+                        row.classList.add('top-rank');
+                    }
+
+                    row.innerHTML = `
+                        ${renderTrend(item.diff_rank)}
+                        <div class="rank-number">${item.rank || 0}</div>
+                        <div class="player-name">${item.name || 'Unknown'}</div>
+                        <div class="player-score">${item.total || 0}<span> TẤT</span></div>
+                    `;
+
+                    leaderboard.appendChild(row);
+                });
+
+            } catch (err) {
+                leaderboard.innerHTML = '<div class="error">Lỗi tải dữ liệu</div>';
+                console.error(err);
+            }
+        }
+
+        loadData();
+        setInterval(loadData, 30000);
+    </script>
+</body>
+</html>
