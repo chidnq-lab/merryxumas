@@ -1,0 +1,202 @@
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bảng Xếp Hạng</title>
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;900&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Montserrat', sans-serif;
+    background: transparent;
+}
+
+/* ===== BACKGROUND SECTION ===== */
+.bg-wrapper {
+    width: 100%;
+    max-width: 390px;
+    margin: 0 auto;
+    background-image: url('https://drive.google.com/uc?export=view&id=1-NjkBwcUyTC1O0B83G6oSYuA-GS8vYiF');
+    background-size: cover;
+    background-position: center top;
+    background-repeat: no-repeat;
+}
+
+/* ===== HEADER AREA (H = 370px) ===== */
+.header-area {
+    height: 370px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.header-area h2 {
+    background: rgba(255, 255, 255, 0.75);
+    padding: 12px 26px;
+    border-radius: 999px;
+    font-size: 20px;
+    font-weight: 900;
+    color: #0b409f;
+}
+
+/* ===== SPACE UNTIL TABLE (H = 427px) ===== */
+.spacer {
+    height: 57px; /* 427 - 370 */
+}
+
+/* ===== LEADERBOARD ===== */
+.container {
+    background: #fff;
+    border-radius: 14px;
+    overflow: hidden;
+    margin: 0 14px 20px;
+}
+
+.player-row {
+    display: grid;
+    grid-template-columns: 36px 36px 1fr 60px;
+    align-items: center;
+    padding: 10px 12px;
+    border-bottom: 1.5px solid #0c409f;
+}
+
+.player-row:last-child {
+    border-bottom: none;
+}
+
+.player-row.top-rank {
+    background: #fff8e1;
+}
+
+/* ===== TREND ===== */
+.trend {
+    text-align: center;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.trend-up { color: #00b050; }
+.trend-down { color: #ff0000; }
+.trend-same { color: #999; }
+
+/* ===== RANK ===== */
+.rank-number {
+    text-align: center;
+    font-size: 16px;
+    font-weight: 900;
+    color: #0c409f;
+}
+
+.player-row.top-rank .rank-number {
+    color: #ff9800;
+}
+
+/* ===== NAME ===== */
+.player-name {
+    font-size: 13px;
+    font-weight: 700;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    padding: 0 6px;
+}
+
+/* ===== SCORE ===== */
+.player-score {
+    text-align: right;
+    font-size: 15px;
+    font-weight: 900;
+}
+
+.player-score span {
+    font-size: 10px;
+    font-weight: 500;
+    color: #666;
+}
+
+/* ===== STATE ===== */
+.loading,
+.error {
+    text-align: center;
+    padding: 28px 16px;
+    font-size: 13px;
+    color: #666;
+}
+
+.error { color: #ff0000; }
+</style>
+
+
+
+
+<div class="bg-wrapper">
+
+    <!-- HEADER -->
+    <div class="header-area">
+        <h2>BẢNG XẾP HẠNG</h2>
+    </div>
+
+    <!-- GAP TO H = 427 -->
+    <div class="spacer"></div>
+
+    <!-- LEADERBOARD -->
+    <div class="container">
+        <div id="leaderboard">
+            <div class="loading">Đang tải dữ liệu...</div>
+        </div>
+    </div>
+
+</div>
+
+<script>
+const API_URL = 'https://script.google.com/macros/s/AKfycbwDNjJpX7PmCt1Nhp62ZAjbbT6u4ru5ikOkcE_7u7DPbKKH7-jA0UbMEBJisG9TGo4s/exec';
+
+function renderTrend(diffRank) {
+    if (diffRank === '-' || diffRank === null || diffRank === undefined) {
+        return '<div class="trend trend-same">━</div>';
+    }
+
+    const n = Number(diffRank);
+    if (n > 0) return `<div class="trend trend-up">▲ +${n}</div>`;
+    if (n < 0) return `<div class="trend trend-down">▼ ${n}</div>`;
+    return '<div class="trend trend-same">━</div>';
+}
+
+async function loadData() {
+    const leaderboard = document.getElementById('leaderboard');
+
+    try {
+        const res = await fetch(API_URL + '?t=' + Date.now());
+        if (!res.ok) throw new Error(res.status);
+
+        const data = await res.json();
+        leaderboard.innerHTML = '';
+
+        data.forEach(item => {
+            const row = document.createElement('div');
+            row.className = 'player-row';
+            if (item.rank <= 3) row.classList.add('top-rank');
+
+            row.innerHTML = `
+                ${renderTrend(item.diff_rank)}
+                <div class="rank-number">${item.rank}</div>
+                <div class="player-name">${item.name}</div>
+                <div class="player-score">${item.total}<span> TẤT</span></div>
+            `;
+
+            leaderboard.appendChild(row);
+        });
+
+    } catch (e) {
+        leaderboard.innerHTML = '<div class="error">Lỗi tải dữ liệu</div>';
+    }
+}
+
+loadData();
+setInterval(loadData, 30000);
+</script>
