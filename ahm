@@ -3,7 +3,7 @@
 <title>Bảng Xếp Hạng</title>
 
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;900&display=swap');
 
 * {
     margin: 0;
@@ -16,73 +16,53 @@ body {
     background: transparent;
 }
 
-/* ===== BACKGROUND SECTION ===== */
-.bg-wrapper {
-    width: 100%;
-    max-width: 390px;
-    margin: 0 auto;
-    background-image: url('https://drive.google.com/uc?export=view&id=1-NjkBwcUyTC1O0B83G6oSYuA-GS8vYiF');
-    background-size: cover;
-    background-position: center top;
-    background-repeat: no-repeat;
-}
-
-/* ===== HEADER AREA (H = 370px) ===== */
-.header-area {
-    height: 370px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.header-area h2 {
-    background: rgba(255, 255, 255, 0.75);
-    padding: 12px 26px;
-    border-radius: 999px;
-    font-size: 20px;
-    font-weight: 900;
-    color: #0b409f;
-}
-
-/* ===== SPACE UNTIL TABLE (H = 427px) ===== */
-.spacer {
-    height: 57px; /* 427 - 370 */
-}
-
-/* ===== LEADERBOARD ===== */
+/* ===== CONTAINER GỌN CHO EMBED ===== */
 .container {
+    width: 100%;
+    max-width: 360px;
+    margin: 0 auto;
     background: #fff;
     border-radius: 14px;
     overflow: hidden;
-    margin: 0 14px 20px;
 }
 
+/* ===== ROW ===== */
 .player-row {
     display: grid;
-    grid-template-columns: 36px 36px 1fr 60px;
+    grid-template-columns: 34px 36px 1fr 58px;
     align-items: center;
     padding: 10px 12px;
     border-bottom: 1.5px solid #0c409f;
 }
 
-.player-row:last-child {
-    border-bottom: none;
-}
 
-.player-row.top-rank {
-    background: #fff8e1;
-}
 
 /* ===== TREND ===== */
 .trend {
-    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1px;
     font-size: 13px;
     font-weight: 700;
 }
 
-.trend-up { color: #00b050; }
-.trend-down { color: #ff0000; }
-.trend-same { color: #999; }
+.trend-up {
+    color: #00b050;
+}
+
+.trend-down {
+    color: #ff0000;
+}
+
+.trend-same {
+    color: #999;
+}
+
+.trend small {
+    font-size: 10px;
+    font-weight: 600;
+}
 
 /* ===== RANK ===== */
 .rank-number {
@@ -128,45 +108,40 @@ body {
     color: #666;
 }
 
-.error { color: #ff0000; }
+.error {
+    color: #ff0000;
+}
 </style>
 
-
-
-
-<div class="bg-wrapper">
-
-    <!-- HEADER -->
-    <div class="header-area">
-        <h2>BẢNG XẾP HẠNG</h2>
+<div class="container">
+    <div id="leaderboard">
+        <div class="loading">Đang tải dữ liệu...</div>
     </div>
-
-    <!-- GAP TO H = 427 -->
-    <div class="spacer"></div>
-
-    <!-- LEADERBOARD -->
-    <div class="container">
-        <div id="leaderboard">
-            <div class="loading">Đang tải dữ liệu...</div>
-        </div>
-    </div>
-
 </div>
 
 <script>
-const API_URL = 'https://script.google.com/macros/s/AKfycbwDNjJpX7PmCt1Nhp62ZAjbbT6u4ru5ikOkcE_7u7DPbKKH7-jA0UbMEBJisG9TGo4s/exec';
+const API_URL = 'https://script.google.com/macros/s/AKfycbz1aX1mwO3d76cXKW6eZxbT8_3L2eu7YzanH6WYxvbzxyL44tFuOYkf_30Gr3zXh6Zm/exec';
 
+/* ===== TREND LOGIC ===== */
 function renderTrend(diffRank) {
     if (diffRank === '-' || diffRank === null || diffRank === undefined) {
         return '<div class="trend trend-same">━</div>';
     }
 
     const n = Number(diffRank);
-    if (n > 0) return `<div class="trend trend-up">▲ +${n}</div>`;
-    if (n < 0) return `<div class="trend trend-down">▼ ${n}</div>`;
+
+    if (n > 0) {
+        return `<div class="trend trend-up">▲<small>+${n}</small></div>`;
+    }
+
+    if (n < 0) {
+        return `<div class="trend trend-down">▼<small>${n}</small></div>`;
+    }
+
     return '<div class="trend trend-same">━</div>';
 }
 
+/* ===== LOAD DATA ===== */
 async function loadData() {
     const leaderboard = document.getElementById('leaderboard');
 
@@ -175,25 +150,40 @@ async function loadData() {
         if (!res.ok) throw new Error(res.status);
 
         const data = await res.json();
+
+        if (!data || data.length === 0) {
+            leaderboard.innerHTML = '<div class="error">Không có dữ liệu</div>';
+            return;
+        }
+
         leaderboard.innerHTML = '';
 
         data.forEach(item => {
             const row = document.createElement('div');
             row.className = 'player-row';
-            if (item.rank <= 3) row.classList.add('top-rank');
+
+            const rank = item.rank || 0;
+            const name = item.name || 'Unknown';
+            const score = item.total || 0;
+            const diffRank = item.diff_rank;
+
+            if (rank <= 3) {
+                row.classList.add('top-rank');
+            }
 
             row.innerHTML = `
-                ${renderTrend(item.diff_rank)}
-                <div class="rank-number">${item.rank}</div>
-                <div class="player-name">${item.name}</div>
-                <div class="player-score">${item.total}<span> TẤT</span></div>
+                ${renderTrend(diffRank)}
+                <div class="rank-number">${rank}</div>
+                <div class="player-name">${name}</div>
+                <div class="player-score">${score}<span> TẤT</span></div>
             `;
 
             leaderboard.appendChild(row);
         });
 
-    } catch (e) {
+    } catch (err) {
         leaderboard.innerHTML = '<div class="error">Lỗi tải dữ liệu</div>';
+        console.error(err);
     }
 }
 
